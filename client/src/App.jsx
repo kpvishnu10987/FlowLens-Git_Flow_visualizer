@@ -3,15 +3,28 @@ import CommitGraph from './components/CommitGraph';
 import { fetchCommits } from './services/api';
 
 function App() {
-  const [repoDetails,setRepoDetails] = useState({owner : 'facebook',repo : 'react'})
+  const [repoDetails, setRepoDetails] = useState({ owner: 'facebook', repo: 'react' })
   const [data, setData] = useState(null);
   const [selectedCommit, setSelectedCommit] = useState(null);
+  const [searchInput, setSearchInput] = useState("facebook/react")
 
   useEffect(() => {
     fetchCommits(repoDetails.owner, repoDetails.repo)
       .then(json => setData(json))
       .catch(err => console.error(err));
   }, [repoDetails]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const parts = searchInput.split('/')
+
+    if (parts.length === 2) {
+      setRepoDetails({ owner: parts[0], repo: parts[1] });
+      setData(null);
+    } else {
+      alert("Please use format : owner/repo");
+    }
+  }
 
   return (
     <div className="flex h-screen w-screen bg-slate-900 text-slate-200 overflow-hidden font-sans">
@@ -22,6 +35,19 @@ function App() {
           FlowLens
         </h1>
         <p className="text-xs text-slate-500 uppercase tracking-widest mb-8">Git Visualizer</p>
+
+        {/* SEARCH FORM */}
+        <div className="mb-6">
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="owner/repo"
+            />
+          </form>
+        </div>
 
         {/* Stats Card */}
         <div className="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 mb-6">
@@ -73,7 +99,7 @@ function App() {
 
         {/* The Graph */}
         <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          {data && data.nodes? (
+          {data && data.nodes ? (
             <CommitGraph nodes={data.nodes} links={data.links} onSelect={setSelectedCommit} />
           ) : (
             <div className="flex flex-col items-center">
