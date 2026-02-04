@@ -3,14 +3,15 @@ import CommitGraph from './components/CommitGraph';
 import { fetchCommits } from './services/api';
 
 function App() {
+  const [repoDetails,setRepoDetails] = useState({owner : 'facebook',repo : 'react'})
   const [data, setData] = useState(null);
   const [selectedCommit, setSelectedCommit] = useState(null);
 
   useEffect(() => {
-    fetchCommits('facebook', 'react')
+    fetchCommits(repoDetails.owner, repoDetails.repo)
       .then(json => setData(json))
       .catch(err => console.error(err));
-  }, []);
+  }, [repoDetails]);
 
   return (
     <div className="flex h-screen w-screen bg-slate-900 text-slate-200 overflow-hidden font-sans">
@@ -25,7 +26,7 @@ function App() {
         {/* Stats Card */}
         <div className="bg-slate-700/30 p-4 rounded-xl border border-slate-600/50 mb-6">
           <h3 className="text-sm font-semibold text-slate-300 mb-1">Active Repo</h3>
-          <p className="text-lg font-mono text-blue-300">facebook/react</p>
+          <p className="text-lg font-mono text-blue-300">{repoDetails.owner}/{repoDetails.repo}</p>
           <div className="mt-4 flex justify-between text-xs text-slate-400">
             <span>Commits Loaded:</span>
             <span className="text-white">{data?.nodes?.length || 0}</span>
